@@ -1,4 +1,5 @@
-import { ConflictError, NotFoundError } from "../../common/error";
+import { BadRequestError, ConflictError, NotFoundError } from "../../common/error";
+import { validateUrl } from "../../common/utils/validateUrl";
 import type { Alias } from "./model";
 
 const aliases = new Map<string, Alias>();
@@ -14,6 +15,10 @@ export function getAlias(alias: string): Alias {
 }
 
 export function createAlias(alias: string, url: string): Alias {
+  if (!validateUrl(url)) {
+    throw new BadRequestError("Invalid url", "INVALID_URL");
+  }
+
   const existing = aliases.get(alias);
   if (existing) {
     throw new ConflictError("Alias already exists", "ALIAS_ALREADY_EXISTS");

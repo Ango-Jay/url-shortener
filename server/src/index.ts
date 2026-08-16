@@ -1,11 +1,10 @@
 import Koa from "koa";
+import { healthModule } from "./modules/health";
 
 const app = new Koa();
 const port = Number(process.env.PORT) || 3000;
 
-app.use(async (ctx) => {
-  ctx.body = { message: "url-shortner" };
-});
+healthModule.install(app);
 
 app.listen(port, () => {
   console.log(`Server listening on http://localhost:${port}`);

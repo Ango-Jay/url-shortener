@@ -1,3 +1,5 @@
+import path from "node:path";
+import dotenv from "dotenv";
 import Koa from "koa";
 import cors from "@koa/cors";
 import bodyParser from "koa-bodyparser";
@@ -7,8 +9,10 @@ import { requestLogMiddleware } from "./middleware/request-log";
 import { aliasModule } from "./modules/alias";
 import { healthModule } from "./modules/health";
 
+dotenv.config({ path: path.resolve(__dirname, "../../.env.local") });
+
 const app = new Koa();
-const port = Number(process.env.PORT) || 4000;
+const port = Number(process.env.API_PORT ?? process.env.PORT) || 4000;
 const allowedOrigins = (
   process.env.CLIENT_URL ?? "http://localhost:3001"
 )

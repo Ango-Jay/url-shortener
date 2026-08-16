@@ -1,13 +1,13 @@
 import { useState, type FormEvent } from "react";
 import { ArrowRight, Search } from "lucide-react";
-import { createAlias, type Alias } from "../lib/api";
+import { createAlias, type CreateAliasResponse } from "../lib/api";
 import { ApiError } from "../lib/http";
 
 export default function UrlForm() {
   const [url, setUrl] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [result, setResult] = useState<Alias | null>(null);
+  const [result, setResult] = useState<CreateAliasResponse | null>(null);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -28,10 +28,6 @@ export default function UrlForm() {
       setLoading(false);
     }
   }
-
-  const shortLink = result
-    ? `${window.location.origin}/${result.alias}`
-    : null;
 
   return (
     <div className="flex w-full max-w-xl flex-col gap-3">
@@ -56,7 +52,6 @@ export default function UrlForm() {
             className="w-full rounded-xl border border-nightBorder bg-nightRaised py-3.5 pl-12 pr-4 text-base text-surface outline-none transition placeholder:text-surface/40 focus:border-lightPurple focus:bg-nightRaised/50 focus:ring-2 focus:ring-lightPurple/40 disabled:opacity-60"
           />
         </label>
-        {/* her */}
         <button
           type="submit"
           disabled={loading}
@@ -73,17 +68,19 @@ export default function UrlForm() {
         </p>
       )}
 
-      {result && shortLink && (
+      {result && (
         <div className="rounded-xl border border-nightBorder bg-nightRaised px-4 py-3 text-left">
           <p className="text-xs uppercase tracking-wide text-surface/50">
             Short link
           </p>
-          <p className="mt-1 break-all font-medium text-lightPurple">
-            {shortLink}
-          </p>
-          <p className="mt-2 break-all text-sm text-surface/60">
-            Alias: {result.alias}
-          </p>
+          <a
+            href={result.shortLink}
+            className="mt-1 block break-all font-medium text-lightPurple hover:underline"
+            target="_blank"
+            rel="noreferrer"
+          >
+            {result.shortLink}
+          </a>
         </div>
       )}
     </div>

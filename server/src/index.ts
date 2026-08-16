@@ -8,7 +8,7 @@ import { aliasModule } from "./modules/alias";
 import { healthModule } from "./modules/health";
 
 const app = new Koa();
-const port = Number(process.env.PORT) || 3000;
+const port = Number(process.env.PORT) || 4000;
 
 app.on("error", (err) => {
   logger.error({ err }, "Application error");

@@ -1,16 +1,39 @@
 ---
-
+import Layout from "../layouts/Layout.astro";
+import "../styles/global.css";
+import UrlForm from "../components/UrlForm";
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<Layout title="Zap link">
+	<main
+		class="relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-6 py-16"
+	>
+		<div
+			class="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,_#160d45_0%,_#0c0630_55%,_#090040_100%)]"
+			aria-hidden="true"
+		>
+		</div>
+		<div
+			class="pointer-events-none absolute -left-24 top-1/4 size-72 rounded-full bg-lightPurple/20 blur-3xl"
+			aria-hidden="true"
+		>
+		</div>
+		<div
+			class="pointer-events-none absolute -right-16 bottom-1/4 size-64 rounded-full bg-darkPurple/80 blur-3xl"
+			aria-hidden="true"
+		>
+		</div>
+
+		<div class="relative z-10 flex w-full max-w-2xl flex-col items-center text-center">
+			<h1 class="font-heading text-5xl font-bold tracking-tight text-surface sm:text-6xl md:text-7xl">
+				Zap link
+			</h1>
+			<p class="mt-4 max-w-md text-lg text-surface/70 sm:text-xl">
+				Paste a long URL and get a short link in one click.
+			</p>
+			<div class="mt-10 w-full flex justify-center">
+				<UrlForm client:load />
+			</div>
+		</div>
+	</main>
+</Layout>

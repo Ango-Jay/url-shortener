@@ -3,3 +3,7 @@ export type Alias = {
   url: string;
   createdAt: string;
 };
+
+export type CreateAliasResponse = {
+  shortLink: string;
+};

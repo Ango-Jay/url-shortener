@@ -1,0 +1,23 @@
+{
+  "name": "url-shortner",
+  "version": "1.0.0",
+  "private": true,
+  "description": "shorten urls",
+  "license": "ISC",
+  "author": "Ango-Jay",
+  "workspaces": [
+    "client",
+    "server"
+  ],
+  "scripts": {
+    "dev": "yarn workspace server dev",
+    "build": "yarn workspace server build",
+    "start": "yarn workspace server start",
+    "dev:server": "yarn workspace server dev",
+    "build:server": "yarn workspace server build",
+    "start:server": "yarn workspace server start",
+    "dev:client": "yarn workspace client dev",
+    "build:client": "yarn workspace client build",
+    "preview:client": "yarn workspace client preview"
+  }
+}

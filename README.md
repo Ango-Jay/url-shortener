@@ -27,9 +27,10 @@ API_PORT=4000
 API_PUBLIC_URL=http://localhost:4000
 CLIENT_URL=http://localhost:3001
 DATABASE_URL=postgres://urlshortner:urlshortner@localhost:5455/urlshortner
+REDIS_URL=redis://localhost:6380
 ```
 
-Start Postgres. It runs in Docker on host port **5455** so it does not clash with a local Postgres on 5432.
+Start Postgres and Redis. Postgres is on host port **5455** (avoids a local Postgres on 5432). Redis is on host port **6380** (avoids a local Redis on 6379).
 
 ```bash
 yarn db:up
@@ -69,10 +70,14 @@ In `psql`, run these as **separate** commands:
 SELECT * FROM aliases;
 ```
 
+`POST /aliases` is limited to 10 requests per 60 seconds per IP. An 11th rapid request should return **429**.
+
 ### Troubleshooting
 
 - **`DATABASE_URL is not configured`** — values are missing from `server/.env`. Dotenv loads from the server cwd, not the repo root.
+- **`REDIS_URL is not configured`** — add `REDIS_URL=redis://localhost:6380` to `server/.env`.
 - **`role "urlshortner" does not exist`** — the app is talking to local Postgres on 5432 instead of Docker on 5455. Check `DATABASE_URL` uses port `5455`.
+- **Redis connection refused** — Redis is not running, or `REDIS_URL` is not using port `6380`. Run `yarn db:up`.
 
 ## Client
 

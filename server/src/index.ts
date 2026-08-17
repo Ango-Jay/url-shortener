@@ -6,6 +6,7 @@ import { config } from "./config";
 import { logger } from "./common/logger";
 import { initializeDb } from "./config/db";
 import type { Dependencies } from "./config/dependencies";
+import { initializeRedis } from "./config/redis";
 import { errorMiddleware } from "./middleware/error";
 import { requestLogMiddleware } from "./middleware/request-log";
 import { aliasModule } from "./modules/alias";
@@ -39,8 +40,12 @@ async function bootstrap(): Promise<void> {
   const dataSource = await initializeDb();
   logger.info("Database connected");
 
+  const redis = await initializeRedis();
+  logger.info("Redis connected");
+
   const dependencies: Dependencies = {
     aliasRepository: dataSource.getRepository(Alias),
+    redis,
   };
 
   healthModule.install(app);

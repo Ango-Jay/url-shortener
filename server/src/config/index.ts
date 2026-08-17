@@ -7,6 +7,7 @@ export type AppConfig = {
   apiPublicUrl: string;
   clientOrigins: string[];
   databaseUrl: string;
+  redisUrl: string;
   logLevel: string;
 };
 
@@ -42,6 +43,7 @@ export const config: AppConfig = (() => {
       apiPublicUrl: requireEnv("API_PUBLIC_URL").replace(/\/$/, ""),
       clientOrigins: [requireEnv("CLIENT_URL")],
       databaseUrl: requireEnv("DATABASE_URL"),
+      redisUrl: requireEnv("REDIS_URL"),
       logLevel,
     };
   }
@@ -49,6 +51,11 @@ export const config: AppConfig = (() => {
   const databaseUrl = process.env.DATABASE_URL;
   if (!databaseUrl) {
     throw new Error("DATABASE_URL is not configured");
+  }
+
+  const redisUrl = process.env.REDIS_URL;
+  if (!redisUrl) {
+    throw new Error("REDIS_URL is not configured");
   }
 
   return {
@@ -61,6 +68,7 @@ export const config: AppConfig = (() => {
     ),
     clientOrigins: [process.env.CLIENT_URL ?? "http://localhost:3001"],
     databaseUrl,
+    redisUrl,
     logLevel,
   };
 })();

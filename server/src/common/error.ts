@@ -38,6 +38,13 @@ export class InternalError extends AppError {
   }
 }
 
+export class TooManyRequestsError extends AppError {
+  constructor(message = "Too many requests", code = "RATE_LIMITED") {
+    super(429, code, message);
+    this.name = "TooManyRequestsError";
+  }
+}
+
 export type ErrorBody = {
   error: {
     status: number;

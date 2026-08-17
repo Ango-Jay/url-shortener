@@ -1,9 +1,18 @@
-export type Alias = {
-  alias: string;
-  url: string;
-  createdAt: string;
-};
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  PrimaryColumn,
+} from "typeorm";
 
-export type CreateAliasResponse = {
-  shortLink: string;
-};
+@Entity("aliases")
+export class Alias {
+  @PrimaryColumn("text")
+  alias!: string;
+
+  @Column("text")
+  url!: string;
+
+  @CreateDateColumn({ type: "timestamptz", name: "created_at" })
+  createdAt!: Date;
+}

@@ -1,6 +1,6 @@
 import type { Context } from "koa";
 import { BadRequestError, InternalError } from "../../common/error";
-import type { CreateAliasResponse } from "./model";
+import type { CreateAliasResponse } from "./dto";
 import * as aliasService from "./service";
 
 function apiBase(): string {
@@ -13,7 +13,7 @@ function apiBase(): string {
 
 export async function getAlias(ctx: Context): Promise<void> {
   const alias = ctx.params.alias;
-  const result = aliasService.getAlias(alias);
+  const result = await aliasService.getAlias(alias);
 
   ctx.status = 302;
   ctx.set("Location", result.url);
@@ -27,7 +27,7 @@ export async function createAlias(ctx: Context): Promise<void> {
     throw new BadRequestError("url is required");
   }
 
-  const created = aliasService.createAlias(url);
+  const created = await aliasService.createAlias(url);
   const response: CreateAliasResponse = {
     shortLink: `${apiBase()}/aliases/${created.alias}`,
   };

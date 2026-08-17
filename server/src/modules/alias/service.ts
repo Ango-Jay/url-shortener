@@ -1,14 +1,15 @@
 import { nanoid } from "nanoid";
+import { AppDataSource } from "../../config/db";
 import { BadRequestError, ConflictError, NotFoundError } from "../../common/error";
+import { isUniqueViolation } from "../../common/utils/isUniqueViolation";
 import { validateUrl } from "../../common/utils/validateUrl";
-import type { Alias } from "./model";
+import { Alias } from "./model";
 
-const MAX_LENGTH = 8; // determine the length of the alias
-const MAX_RETRY_ATTEMPT = 5; // determine the maximum number of attempts to generate a unique alias
-const aliases = new Map<string, Alias>();
+const MAX_LENGTH = 8;
+const MAX_RETRY_ATTEMPT = 5;
 
-export function getAlias(alias: string): Alias {
-  const result = aliases.get(alias);
+export async function getAlias(alias: string): Promise<Alias> {
+  const result = await AppDataSource().getRepository(Alias).findOneBy({ alias });
 
   if (!result) {
     throw new NotFoundError("Alias not found", "ALIAS_NOT_FOUND");
@@ -17,26 +18,25 @@ export function getAlias(alias: string): Alias {
   return result;
 }
 
-export function createAlias(url: string): Alias {
+export async function createAlias(url: string): Promise<Alias> {
   if (!validateUrl(url)) {
     throw new BadRequestError("Invalid url", "INVALID_URL");
   }
 
+  const repository = AppDataSource().getRepository(Alias);
+
   for (let attempt = 0; attempt < MAX_RETRY_ATTEMPT; attempt++) {
     const alias = nanoid(MAX_LENGTH);
+    const created = repository.create({ alias, url });
 
-    if (aliases.has(alias)) {
-      continue;
+    try {
+      return await repository.save(created);
+    } catch (error) {
+      if (isUniqueViolation(error)) {
+        continue;
+      }
+      throw error;
     }
-
-    const created: Alias = {
-      alias,
-      url,
-      createdAt: new Date().toISOString(),
-    };
-
-    aliases.set(alias, created);
-    return created;
   }
 
   throw new ConflictError("Alias already exists", "ALIAS_ALREADY_EXISTS");

@@ -18,6 +18,7 @@
     "start:server": "yarn workspace server start",
     "dev:client": "yarn workspace client dev",
     "build:client": "yarn workspace client build",
-    "preview:client": "yarn workspace client preview"
+    "preview:client": "yarn workspace client preview",
+    "db:up": "docker compose up -d"
   }
 }

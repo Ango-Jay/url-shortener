@@ -4,11 +4,13 @@ import dotenv from "dotenv";
 import Koa from "koa";
 import cors from "@koa/cors";
 import bodyParser from "koa-bodyparser";
-import { initializeDb } from "./config/db";
+import type { Dependencies } from "./config/dependencies";
 import { logger } from "./common/logger";
+import { initializeDb } from "./config/db";
 import { errorMiddleware } from "./middleware/error";
 import { requestLogMiddleware } from "./middleware/request-log";
 import { aliasModule } from "./modules/alias";
+import { Alias } from "./modules/alias/model";
 import { healthModule } from "./modules/health";
 
 async function bootstrap(): Promise<void> {
@@ -20,7 +22,7 @@ async function bootstrap(): Promise<void> {
     .split(",")
     .map((origin) => origin.trim())
     .filter(Boolean);
-// middleware
+
   app.on("error", (err) => {
     logger.error({ err }, "Application error");
   });
@@ -37,13 +39,15 @@ async function bootstrap(): Promise<void> {
   app.use(errorMiddleware);
   app.use(bodyParser());
 
-  // modules
-  healthModule.install(app);
-  aliasModule.install(app);
-  
-// db
-  await initializeDb();
+  const dataSource = await initializeDb();
   logger.info("Database connected");
+
+  const dependencies: Dependencies = {
+    aliasRepository: dataSource.getRepository(Alias),
+  };
+
+  healthModule.install(app);
+  aliasModule.install(app, dependencies);
 
   app.listen(port, () => {
     logger.info(`Server listening on http://localhost:${port}`);

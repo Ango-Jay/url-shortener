@@ -1,17 +1,20 @@
 import type Koa from "koa";
 import type Router from "@koa/router";
+import type { Dependencies } from "../config/dependencies";
 
 export type AppModule = {
   name: string;
-  router: Router;
-  install(app: Koa): void;
+  install(app: Koa, dependencies?: Dependencies): void;
 };
 
-export function createModule(name: string, router: Router): AppModule {
+export function createModule(
+  name: string,
+  setup: (dependencies?: Dependencies) => Router,
+): AppModule {
   return {
     name,
-    router,
-    install(app) {
+    install(app, dependencies) {
+      const router = setup(dependencies);
       app.use(router.routes()).use(router.allowedMethods());
     },
   };

@@ -1,12 +1,11 @@
 import "reflect-metadata";
-import path from "node:path";
-import dotenv from "dotenv";
 import Koa from "koa";
 import cors from "@koa/cors";
 import bodyParser from "koa-bodyparser";
-import type { Dependencies } from "./config/dependencies";
+import { config } from "./config";
 import { logger } from "./common/logger";
 import { initializeDb } from "./config/db";
+import type { Dependencies } from "./config/dependencies";
 import { errorMiddleware } from "./middleware/error";
 import { requestLogMiddleware } from "./middleware/request-log";
 import { aliasModule } from "./modules/alias";
@@ -14,14 +13,7 @@ import { Alias } from "./modules/alias/model";
 import { healthModule } from "./modules/health";
 
 async function bootstrap(): Promise<void> {
-  dotenv.config({ path: path.resolve(__dirname, "../../.env.local") });
-
   const app = new Koa();
-  const port = Number(process.env.API_PORT ?? process.env.PORT) || 4000;
-  const allowedOrigins = (process.env.CLIENT_URL ?? "http://localhost:3001")
-    .split(",")
-    .map((origin) => origin.trim())
-    .filter(Boolean);
 
   app.on("error", (err) => {
     logger.error({ err }, "Application error");
@@ -31,6 +23,11 @@ async function bootstrap(): Promise<void> {
     cors({
       origin: (ctx) => {
         const requestOrigin = ctx.get("Origin");
+        const allowedOrigins = config.clientOrigins
+          .flatMap((origin) => origin.split(","))
+          .map((origin) => origin.trim())
+          .filter(Boolean);
+
         return allowedOrigins.includes(requestOrigin) ? requestOrigin : "";
       },
     }),
@@ -49,8 +46,8 @@ async function bootstrap(): Promise<void> {
   healthModule.install(app);
   aliasModule.install(app, dependencies);
 
-  app.listen(port, () => {
-    logger.info(`Server listening on http://localhost:${port}`);
+  app.listen(config.port, () => {
+    logger.info(`Server listening on http://localhost:${config.port}`);
   });
 }
 

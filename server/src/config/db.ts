@@ -1,15 +1,11 @@
 import { DataSource } from "typeorm";
 import { Alias } from "../modules/alias/model";
+import { config } from "./index";
 
 export async function initializeDb(): Promise<DataSource> {
-  const url = process.env.DATABASE_URL;
-  if (!url) {
-    throw new Error("DATABASE_URL is not configured");
-  }
-
   const dataSource = new DataSource({
     type: "postgres",
-    url,
+    url: config.databaseUrl,
     entities: [Alias],
     synchronize: true,
   });

@@ -1,15 +1,8 @@
 import type { Context } from "koa";
-import { BadRequestError, InternalError } from "../../common/error";
+import { BadRequestError } from "../../common/error";
+import { config } from "../../config";
 import type { CreateAliasResponse } from "./dto";
 import type { AliasService } from "./service";
-
-function apiBase(): string {
-  const base = process.env.API_PUBLIC_URL?.replace(/\/$/, "");
-  if (!base) {
-    throw new InternalError("API_PUBLIC_URL is not configured");
-  }
-  return base;
-}
 
 export function createAliasController(service: AliasService) {
   async function getAlias(ctx: Context): Promise<void> {
@@ -30,7 +23,7 @@ export function createAliasController(service: AliasService) {
 
     const created = await service.createAlias(url);
     const response: CreateAliasResponse = {
-      shortLink: `${apiBase()}/aliases/${created.alias}`,
+      shortLink: `${config.apiPublicUrl}/aliases/${created.alias}`,
     };
 
     ctx.status = 201;

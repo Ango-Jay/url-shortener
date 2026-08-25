@@ -1,5 +1,6 @@
 import type { Repository } from "typeorm";
 import { nanoid } from "nanoid";
+import type { Cache } from "../../common/cache";
 import { BadRequestError, ConflictError, NotFoundError } from "../../common/error";
 import { isUniqueViolation } from "../../common/utils/isUniqueViolation";
 import { validateUrl } from "../../common/utils/validateUrl";
@@ -8,14 +9,23 @@ import { Alias } from "./model";
 const MAX_LENGTH = 8;
 const MAX_RETRY_ATTEMPT = 5;
 
-export function createAliasService(repository: Repository<Alias>) {
+export function createAliasService(
+  repository: Repository<Alias>,
+  cache: Cache<string, Alias>,
+) {
   async function getAlias(alias: string): Promise<Alias> {
+    const cached = cache.get(alias);
+    if (cached) {
+      return cached;
+    }
+
     const result = await repository.findOneBy({ alias });
 
     if (!result) {
       throw new NotFoundError("Alias not found", "ALIAS_NOT_FOUND");
     }
 
+    cache.set(alias, result);
     return result;
   }
 
@@ -29,7 +39,9 @@ export function createAliasService(repository: Repository<Alias>) {
       const created = repository.create({ alias, url });
 
       try {
-        return await repository.save(created);
+        const saved = await repository.save(created);
+        cache.set(saved.alias, saved);
+        return saved;
       } catch (error) {
         if (isUniqueViolation(error)) {
           continue;

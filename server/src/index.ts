@@ -3,6 +3,7 @@ import Koa from "koa";
 import cors from "@koa/cors";
 import bodyParser from "koa-bodyparser";
 import { config } from "./config";
+import { createCache } from "./common/cache";
 import { logger } from "./common/logger";
 import { initializeDb } from "./config/db";
 import type { Dependencies } from "./config/dependencies";
@@ -43,9 +44,15 @@ async function bootstrap(): Promise<void> {
   const redis = await initializeRedis();
   logger.info("Redis connected");
 
+  const aliasCache = createCache<string, Alias>({
+    max: 1000,
+    ttl: 1000 * 60 * 5,
+  });
+
   const dependencies: Dependencies = {
     aliasRepository: dataSource.getRepository(Alias),
     redis,
+    aliasCache,
   };
 
   healthModule.install(app);

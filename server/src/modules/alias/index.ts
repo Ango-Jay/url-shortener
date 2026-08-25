@@ -13,7 +13,14 @@ export const aliasModule = createModule("alias", (dependencies) => {
     throw new Error("Alias module requires redis");
   }
 
-  const service = createAliasService(dependencies.aliasRepository);
+  if (!dependencies.aliasCache) {
+    throw new Error("Alias module requires aliasCache");
+  }
+
+  const service = createAliasService(
+    dependencies.aliasRepository,
+    dependencies.aliasCache,
+  );
   const controller = createAliasController(service);
   const rateLimit = createRateLimitMiddleware(dependencies.redis);
   const router = new Router();
